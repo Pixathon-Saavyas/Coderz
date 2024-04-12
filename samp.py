@@ -1,38 +1,21 @@
+import os
+import google.generativeai as genai
 
 
-from samp import generate_summary
-from uagents import Agent, Context, Model
+def generate_summary(story):
+    # Set your API key
+    os.environ['YOUR_API_KEY'] = "AIzaSyCCgV_4zM-zQQfui-vs8QNZ8LKyVVD5k4Y"
 
+    # Configure Gemini AI
+    genai.configure(api_key=os.environ['YOUR_API_KEY'])
+    model = genai.GenerativeModel('gemini-pro')
 
-class Message(Model):
-    message: str
+    # Concatenate static text with the story
+    static_text = "I want to break this story into multiple parts so tht i can make photo give prompts such that it gives each disciption of photo how it should be ,each prompts ending with [&&&] and say last prompt as last prompt"
+    content = static_text + story
 
-SEED_PHRASE = "abc"
+    # Generate content using Gemini AI with the concatenated text
+    response = model.generate_content(content)
 
-AGENT_MAILBOX_KEY = "15699a3a-ea30-4b0d-9969-bb3178dcc840"
-
-agent = Agent(
-    name="alice",
-    seed=SEED_PHRASE,
-    mailbox=f"{AGENT_MAILBOX_KEY}@https://agentverse.ai",
-)
-
-@agent.on_message(model=Message, replies={Message})
-async def handle_message(ctx: Context, sender: str, msg: Message):
-    ctx.logger.info(f"Received message from {sender}: {msg.message}")
-    
-    # Extract the story from the incoming message
-    story = msg.message
-
-    # Generate summary based on the received story
-    summary = generate_summary(story)
-
-    # Log the summary
-    ctx.logger.info(f"Generated summary: {summary}")
-
-    # Send the summary as a response
-    ctx.logger.info("Sending summary to sender")
-    await ctx.send(sender, Message(message=summary))
-
-if _name_     == "main":
-    agent.run()
+    # Return the generated content
+    return response.text
