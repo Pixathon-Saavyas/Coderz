@@ -1,13 +1,16 @@
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
 
+# Load environment variables from .env
+load_dotenv()
 
-def generate_summary(story):
-    # Set your API key
-    os.environ['YOUR_API_KEY'] = "AIzaSyCCgV_4zM-zQQfui-vs8QNZ8LKyVVD5k4Y"
+def generate_summary(story, text_file):
+    # Get API key from environment variable
+    api_key = os.getenv('YOUR_API_KEY')
 
     # Configure Gemini AI
-    genai.configure(api_key=os.environ['YOUR_API_KEY'])
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-pro')
 
     # Concatenate static text with the story
@@ -17,5 +20,12 @@ def generate_summary(story):
     # Generate content using Gemini AI with the concatenated text
     response = model.generate_content(content)
 
+    # Extract prompts from the response
+    prompts = response.text.split("[&&&]")
+
+    # Save prompts to the text file
+    with open(text_file, 'w') as file:
+        file.write("\n".join(prompts))
+
     # Return the generated content
-    return response.text
+    return prompts

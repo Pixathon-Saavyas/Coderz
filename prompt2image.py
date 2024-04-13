@@ -3,9 +3,15 @@ import io
 from PIL import Image
 import os
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
+
 def save_images_from_query(parts, folder='images', filename_prefix='generated_image'):
     API_URL = "https://api-inference.huggingface.co/models/digiplay/AbsoluteReality_v1.8.1"
-    headers = {"Authorization": "Bearer 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"}
+    api_token = os.getenv('HF_API_TOKEN')
+    headers = {"Authorization": f"Bearer {api_token}"}
 
     # Iterate over each part of the story
     for i, part in enumerate(parts, 1):
